@@ -1,0 +1,7 @@
+{
+  "tool_name": "Bash",
+  "tool_input_preview": "{\"command\":\"npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir=false --import-alias=\\\"@/*\\\" --no-git --yes 2>&1\",\"timeout\":120000,\"description\":\"Initialize Next.js project\"}",
+  "error": "Exit code 1\nnpm warn exec The following package was not found and will be installed: create-next-app@16.2.4\nThe directory threads-search contains files that could conflict:\n\n  .omc/\n  CLAUDE.md\n\nEither try using a new directory name, or remove the files listed above.",
+  "timestamp": "2026-04-19T14:33:25.409Z",
+  "retry_count": 1
+}
