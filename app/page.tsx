@@ -62,16 +62,18 @@ export default async function HomePage() {
             <CheckCircle2 className="h-4 w-4 text-green-600" />
             Threads 계정 연결됨
           </div>
-          <Link
-            href="/api/auth/logout"
-            className={cn(
-              buttonVariants({ variant: 'ghost' }),
-              'gap-2 text-muted-foreground'
-            )}
-          >
-            <LogOut className="h-4 w-4" />
-            로그아웃
-          </Link>
+          <form action="/api/auth/logout" method="POST">
+            <button
+              type="submit"
+              className={cn(
+                buttonVariants({ variant: 'ghost' }),
+                'gap-2 text-muted-foreground'
+              )}
+            >
+              <LogOut className="h-4 w-4" />
+              로그아웃
+            </button>
+          </form>
         </div>
       ) : (
         <Link
