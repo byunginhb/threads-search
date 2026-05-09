@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useState, useTransition, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X } from 'lucide-react'
+import { Search, X, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
@@ -18,6 +18,7 @@ const LOG_PREFIX = '[search-bar]'
  */
 export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
   const [query, setQuery] = useState(defaultQuery)
+  const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
   const handleSubmit = (e: FormEvent) => {
@@ -25,13 +26,17 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
     const trimmed = query.trim()
     const url = trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : '/search'
     console.log(`${LOG_PREFIX} submit`, { query: trimmed, url })
-    router.push(url)
+    startTransition(() => {
+      router.push(url)
+    })
   }
 
   const handleClear = () => {
     console.log(`${LOG_PREFIX} clear`)
     setQuery('')
-    router.push('/search')
+    startTransition(() => {
+      router.push('/search')
+    })
   }
 
   return (
@@ -44,9 +49,10 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="내 게시물 검색..."
-              className="pl-9 pr-9 rounded-full bg-muted border-0 focus-visible:ring-1"
+              disabled={isPending}
+              className="pl-9 pr-9 rounded-full bg-muted border-0 focus-visible:ring-1 disabled:opacity-70"
             />
-            {query ? (
+            {query && !isPending ? (
               <button
                 type="button"
                 onClick={handleClear}
@@ -57,10 +63,25 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
               </button>
             ) : null}
           </div>
-          <Button type="submit" size="sm" className="rounded-full px-5">
-            검색
+          <Button
+            type="submit"
+            size="sm"
+            disabled={isPending}
+            className="rounded-full px-5 min-w-[70px]"
+          >
+            {isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin" aria-label="검색 중" />
+            ) : (
+              '검색'
+            )}
           </Button>
         </form>
+        {isPending ? (
+          <p className="text-xs text-muted-foreground mt-2 px-1 flex items-center gap-1.5">
+            <Loader2 className="h-3 w-3 animate-spin" />
+            검색 중입니다…
+          </p>
+        ) : null}
       </div>
     </div>
   )

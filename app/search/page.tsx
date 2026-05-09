@@ -33,7 +33,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="max-w-[620px] mx-auto">
       <SearchBar key={q} defaultQuery={q} />
-      <Suspense fallback={<PostsSkeleton count={8} />}>
+      <Suspense key={q || 'recent'} fallback={<PostsSkeleton count={8} />}>
         {q ? (
           <MySearchResults q={q} userId={userId} accessToken={accessToken} />
         ) : (
