@@ -1,0 +1,14 @@
+{"type":"session.start","ts":"2026-04-29T13:58:28Z","state":"initialized","data":{"cc_session_id":"9179948e-c1fd-4137-9339-2735e2373ae6"}}
+{"id":"event-000001","type":"session.start","ts":"2026-04-29T13:58:28Z","state":"initialized"}
+{"id":"event-000002","type":"session.resume","ts":"2026-04-29T13:58:37Z","state":"initialized"}
+{"id":"event-000003","type":"tool.bash","ts":"2026-04-29T14:25:48Z","state":"initialized","data":{"command":"ls /Users/byunginsong/Documents/studio/threads-search/app/api/ 2>/dev/null && ls /Users/byunginsong/Documents/studio/threads-search/app/auth/ 2>/dev/null"}}
+{"id":"event-000004","type":"tool.bash","ts":"2026-04-29T14:25:51Z","state":"initialized","data":{"command":"find /Users/byunginsong/Documents/studio/threads-search/app -name "*.tsx" -o -name "*.ts" | sort"}}
+{"id":"event-000005","type":"tool.bash","ts":"2026-04-29T14:26:16Z","state":"initialized","data":{"command":"pnpm build 2>&1 | tail -30"}}
+{"id":"event-000006","type":"session.stop","ts":"2026-04-29T14:26:25Z","state":"stopped"}
+{"type":"session.resume","ts":"2026-05-07T13:13:17Z","state":"initialized","data":{"cc_session_id":"4a603562-d10c-48af-a264-c660216baf56","method":"mapping"}}
+{"id":"event-000001","type":"session.start","ts":"2026-05-07T13:13:17Z","state":"initialized"}
+{"id":"event-000002","type":"tool.bash","ts":"2026-05-07T13:17:02Z","state":"initialized","data":{"command":"pkill -f "ngrok http" 2>/dev/null; sleep 1; ngrok http 3000 --log=stdout > /tmp/ngrok.log 2>&1 &
+sleep 4
+curl -s http://localhost:4040/api/tunnels | python3 -c "import sys,json; data=json.load(sys.std"}}
+{"id":"event-000003","type":"tool.edit","ts":"2026-05-07T13:17:09Z","state":"initialized","data":{"file_path":"/Users/byunginsong/Documents/studio/threads-search/.env.local"}}
+{"id":"event-000004","type":"session.stop","ts":"2026-05-07T13:17:16Z","state":"stopped"}

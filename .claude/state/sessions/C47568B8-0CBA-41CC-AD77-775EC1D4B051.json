@@ -1,0 +1,46 @@
+{
+  "session_id": "C47568B8-0CBA-41CC-AD77-775EC1D4B051",
+  "parent_session_id": null,
+  "state": "stopped",
+  "state_version": 1,
+  "started_at": "2026-05-07T13:13:17Z",
+  "updated_at": "2026-05-07T13:17:16Z",
+  "resume_token": "29070BB0-B41D-4730-B11A-DD7A93857AF4",
+  "event_seq": 4,
+  "last_event_id": "event-000004",
+  "fork_count": 0,
+  "orchestration": {
+    "max_state_retries": 3,
+    "retry_backoff_seconds": 10
+  },
+  "cwd": "/Users/byunginsong/Documents/studio/threads-search",
+  "project_name": "threads-search",
+  "prompt_seq": 1,
+  "git": {
+    "branch": "main",
+    "uncommitted_changes": 42,
+    "last_commit": "6d41aaa"
+  },
+  "plans": {
+    "exists": false,
+    "last_modified": 0,
+    "wip_tasks": 0,
+    "todo_tasks": 0,
+    "pending_tasks": 0,
+    "completed_tasks": 0
+  },
+  "changes_this_session": [
+    {
+      "file": ".env.local",
+      "action": "Edit",
+      "timestamp": "2026-05-07T13:17:09Z",
+      "important": false
+    }
+  ],
+  "intent": "literal",
+  "last_message_length": 492,
+  "last_message_hash": "38cec5e2d99d665d",
+  "ended_at": "2026-05-07T13:17:16Z",
+  "duration_minutes": 543,
+  "memory_logged": true
+}

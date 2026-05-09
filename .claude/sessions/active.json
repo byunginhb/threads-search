@@ -1,8 +1,14 @@
 {
-  "E2DCCDEB-E006-48A8-927E-D55CD152013E": {
-    "short_id": "E2DCCDEB-E00",
-    "last_seen": 1776607112,
-    "pid": "19762",
+  "645A1133-A134-40F6-92E1-897CB85F27B9": {
+    "short_id": "645A1133-A13",
+    "last_seen": 1778159536,
+    "pid": "24076",
+    "status": "active"
+  },
+  "DB97D7F3-5F28-4488-96E3-CF3D1C4F8D12": {
+    "short_id": "DB97D7F3-5F2",
+    "last_seen": 1778159597,
+    "pid": "27456",
     "status": "active"
   }
 }
