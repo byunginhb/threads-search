@@ -10,6 +10,9 @@ export async function POST() {
   const cookieStore = await cookies()
   cookieStore.delete('threads_token')
   cookieStore.delete('threads_user_id')
+  cookieStore.delete('threads_username')
+  cookieStore.delete('threads_name')
+  cookieStore.delete('threads_profile_pic')
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? ''
   return NextResponse.redirect(`${appUrl}/auth`, { status: 303 })

@@ -1,12 +1,16 @@
 import Link from 'next/link'
 import { cookies } from 'next/headers'
-import { Search, BarChart2, ArrowRight, LogOut, CheckCircle2 } from 'lucide-react'
+import { Search, BarChart2, ArrowRight, LogOut } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export default async function HomePage() {
   const cookieStore = await cookies()
   const isAuthenticated = Boolean(cookieStore.get('threads_token')?.value)
+  const username = cookieStore.get('threads_username')?.value ?? ''
+  const displayName = cookieStore.get('threads_name')?.value ?? ''
+  const profilePic = cookieStore.get('threads_profile_pic')?.value ?? ''
 
   return (
     <main className="max-w-[620px] mx-auto px-4 py-16 flex flex-col items-center text-center gap-8">
@@ -57,16 +61,30 @@ export default async function HomePage() {
       </div>
 
       {isAuthenticated ? (
-        <div className="flex flex-col items-center gap-2">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
-            Threads 계정 연결됨
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex items-center gap-3 px-4 py-2 rounded-full border border-border bg-muted/30">
+            <Avatar className="h-8 w-8">
+              {profilePic && <AvatarImage src={profilePic} alt={username || 'avatar'} />}
+              <AvatarFallback className="text-xs font-medium">
+                {(username || displayName || '?')[0]?.toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="text-left leading-tight">
+              {displayName && (
+                <div className="text-sm font-semibold text-foreground">
+                  {displayName}
+                </div>
+              )}
+              {username && (
+                <div className="text-xs text-muted-foreground">@{username}</div>
+              )}
+            </div>
           </div>
           <form action="/api/auth/logout" method="POST">
             <button
               type="submit"
               className={cn(
-                buttonVariants({ variant: 'ghost' }),
+                buttonVariants({ variant: 'ghost', size: 'sm' }),
                 'gap-2 text-muted-foreground'
               )}
             >

@@ -82,22 +82,58 @@ export async function GET(request: NextRequest) {
 
   const finalToken = longTokenData.access_token ?? tokenData.access_token
 
+  // 프로필 정보(username, name, profile picture)를 가져와 쿠키에 저장한다.
+  // 홈 페이지에서 매번 API 호출 없이 표시할 수 있게 하기 위함.
+  let username = ''
+  let displayName = ''
+  let profilePictureUrl = ''
+  try {
+    const meUrl = new URL('https://graph.threads.net/v1.0/me')
+    meUrl.searchParams.set('fields', 'username,name,threads_profile_picture_url')
+    meUrl.searchParams.set('access_token', finalToken)
+    const meRes = await fetch(meUrl.toString(), { cache: 'no-store' })
+    if (meRes.ok) {
+      const meData = (await meRes.json()) as {
+        username?: string
+        name?: string
+        threads_profile_picture_url?: string
+      }
+      username = meData.username ?? ''
+      displayName = meData.name ?? ''
+      profilePictureUrl = meData.threads_profile_picture_url ?? ''
+      console.log(`${LOG_PREFIX} profile fetched`, { username, displayName })
+    } else {
+      console.warn(`${LOG_PREFIX} profile fetch failed`, meRes.status)
+    }
+  } catch (e) {
+    console.warn(`${LOG_PREFIX} profile fetch error`, e)
+  }
+
   const cookieStore = await cookies()
   const SIXTY_DAYS = 60 * 24 * 60 * 60
-  cookieStore.set('threads_token', finalToken, {
-    httpOnly: true,
+  const baseCookie = {
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     maxAge: SIXTY_DAYS,
     path: '/',
-  })
+  }
+  cookieStore.set('threads_token', finalToken, { ...baseCookie, httpOnly: true })
   cookieStore.set('threads_user_id', String(tokenData.user_id), {
+    ...baseCookie,
     httpOnly: false,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: SIXTY_DAYS,
-    path: '/',
   })
+  if (username) {
+    cookieStore.set('threads_username', username, { ...baseCookie, httpOnly: false })
+  }
+  if (displayName) {
+    cookieStore.set('threads_name', displayName, { ...baseCookie, httpOnly: false })
+  }
+  if (profilePictureUrl) {
+    cookieStore.set('threads_profile_pic', profilePictureUrl, {
+      ...baseCookie,
+      httpOnly: false,
+    })
+  }
 
   console.log(`${LOG_PREFIX} done — cookies set, redirecting`)
 
