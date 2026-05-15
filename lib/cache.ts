@@ -1,7 +1,6 @@
 /**
  * unstable_cache 기반 사용자별 캐시 래퍼.
  * cookies/headers는 캐시 스코프 외부에서 접근하고, 인자로 전달해야 한다.
- * (Next.js 16: 'use cache' 디렉티브가 권장되지만 unstable_cache도 지원됨)
  */
 
 import { unstable_cache, revalidateTag } from 'next/cache'
@@ -10,6 +9,7 @@ import {
   fetchMyPostsWithInsights,
 } from '@/lib/my-posts'
 import type { ThreadPost, PostWithInsights } from '@/lib/threads-api'
+import { logServer } from '@/lib/log'
 
 const TTL_SECONDS = 300
 
@@ -28,11 +28,8 @@ interface BaseOpts {
 
 /**
  * 사용자 게시물 목록 (인사이트 없음) 캐시 적용 버전.
- * 캐시 키: userId + excludeReplies + limit + maxPages
  */
-export function getCachedMyPosts(
-  opts: BaseOpts
-): Promise<ThreadPost[]> {
+export function getCachedMyPosts(opts: BaseOpts): Promise<ThreadPost[]> {
   const { userId, accessToken, excludeReplies = true, limit, maxPages } = opts
   const keyParts = [
     'my-posts',
@@ -41,7 +38,7 @@ export function getCachedMyPosts(
     String(limit ?? 'd'),
     String(maxPages ?? 'd'),
   ]
-  console.log(`${LOG_PREFIX} getCachedMyPosts`, { keyParts })
+  logServer.debug(`${LOG_PREFIX} getCachedMyPosts`, { keyParts })
 
   const cached = unstable_cache(
     async () =>
@@ -83,7 +80,7 @@ export function getCachedMyPostsWithInsights(
     String(maxPages ?? 'd'),
     String(chunkSize ?? 'd'),
   ]
-  console.log(`${LOG_PREFIX} getCachedMyPostsWithInsights`, { keyParts })
+  logServer.debug(`${LOG_PREFIX} getCachedMyPostsWithInsights`, { keyParts })
 
   const cached = unstable_cache(
     async () =>
@@ -105,11 +102,10 @@ export function getCachedMyPostsWithInsights(
 }
 
 /**
- * 사용자별 캐시를 강제 무효화한다 (Server Action / Route Handler에서 호출).
+ * 사용자별 캐시를 강제 무효화한다.
  */
 export function invalidateMyPostsCache(userId: string): void {
-  console.log(`${LOG_PREFIX} invalidateMyPostsCache`, { userId })
-  // Next.js 16: revalidateTag는 두 번째 인자로 profile(또는 expire 객체)을 요구
+  logServer.debug(`${LOG_PREFIX} invalidateMyPostsCache`, { userId })
   revalidateTag(myPostsTag(userId), { expire: 0 })
   revalidateTag(insightsTag(userId), { expire: 0 })
 }

@@ -1,30 +1,36 @@
 'use client'
 
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Home, Search, BarChart2 } from 'lucide-react'
+import { Link, usePathname } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { href: '/', icon: Home, label: '홈' },
-  { href: '/search', icon: Search, label: '검색' },
-  { href: '/insights', icon: BarChart2, label: '인사이트' },
-]
+  { href: '/', icon: Home, key: 'home' },
+  { href: '/search', icon: Search, key: 'search' },
+  { href: '/insights', icon: BarChart2, key: 'insights' },
+] as const
 
 export function NavBar() {
   const pathname = usePathname()
+  const t = useTranslations('common')
 
   return (
     <>
       {/* PC: 좌측 사이드바 */}
       <nav className="hidden md:flex fixed left-0 top-0 h-full w-[72px] lg:w-[245px] border-r border-border flex-col bg-background z-50">
         <div className="px-3 py-5 lg:px-6">
-          <span className="hidden lg:block text-xl font-bold text-foreground">Threads Search</span>
-          <span className="lg:hidden text-xl font-bold text-foreground">TS</span>
+          <span className="hidden lg:block text-xl font-bold text-foreground">
+            {t('appName')}
+          </span>
+          <span className="lg:hidden text-xl font-bold text-foreground">
+            {t('appShort')}
+          </span>
         </div>
         <div className="flex flex-col gap-1 px-2 lg:px-3 flex-1">
-          {navItems.map(({ href, icon: Icon, label }) => {
-            const isActive = pathname === href || (href !== '/' && pathname.startsWith(href))
+          {navItems.map(({ href, icon: Icon, key }) => {
+            const isActive =
+              pathname === href || (href !== '/' && pathname.startsWith(href))
             return (
               <Link
                 key={href}
@@ -36,8 +42,11 @@ export function NavBar() {
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 )}
               >
-                <Icon className="h-[26px] w-[26px] shrink-0" strokeWidth={isActive ? 2.5 : 2} />
-                <span className="hidden lg:block">{label}</span>
+                <Icon
+                  className="h-[26px] w-[26px] shrink-0"
+                  strokeWidth={isActive ? 2.5 : 2}
+                />
+                <span className="hidden lg:block">{t(key)}</span>
               </Link>
             )
           })}
@@ -46,8 +55,9 @@ export function NavBar() {
 
       {/* 모바일: 하단 탭바 */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 border-t border-border bg-background z-50 flex">
-        {navItems.map(({ href, icon: Icon, label }) => {
-          const isActive = pathname === href || (href !== '/' && pathname.startsWith(href))
+        {navItems.map(({ href, icon: Icon, key }) => {
+          const isActive =
+            pathname === href || (href !== '/' && pathname.startsWith(href))
           return (
             <Link
               key={href}
@@ -58,7 +68,7 @@ export function NavBar() {
               )}
             >
               <Icon className="h-6 w-6" strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[11px]">{label}</span>
+              <span className="text-[11px]">{t(key)}</span>
             </Link>
           )
         })}

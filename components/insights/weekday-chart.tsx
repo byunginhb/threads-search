@@ -11,18 +11,22 @@ import {
   CartesianGrid,
   Legend,
 } from 'recharts'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import type { WeekdayGroup } from '@/lib/insights-stats'
-
-const WEEKDAY_LABELS = ['일', '월', '화', '수', '목', '금', '토'] as const
 
 interface WeekdayChartProps {
   groups: WeekdayGroup[]
 }
 
+const WEEKDAY_KEYS = ['0', '1', '2', '3', '4', '5', '6'] as const
+
 export function WeekdayChart({ groups }: WeekdayChartProps) {
+  const t = useTranslations('insights.charts')
+  const tWeekday = useTranslations('insights.weekday')
+
   const data = groups.map((g) => ({
-    weekday: WEEKDAY_LABELS[g.weekday],
+    weekday: tWeekday(WEEKDAY_KEYS[g.weekday]),
     count: g.count,
     avgViews: g.avgViews,
   }))
@@ -30,7 +34,7 @@ export function WeekdayChart({ groups }: WeekdayChartProps) {
   return (
     <Card>
       <CardContent className="space-y-3">
-        <h3 className="font-semibold text-base">요일별 게시 패턴</h3>
+        <h3 className="font-semibold text-base">{t('weekdayTitle')}</h3>
         <div className="w-full h-[260px]">
           <ResponsiveContainer width="100%" height="100%">
             <ComposedChart
@@ -63,7 +67,7 @@ export function WeekdayChart({ groups }: WeekdayChartProps) {
               <Legend
                 wrapperStyle={{ fontSize: '12px' }}
                 formatter={(v) =>
-                  v === 'count' ? '게시 횟수' : '평균 조회수'
+                  v === 'count' ? t('postCountLegend') : t('avgViewsLegend')
                 }
               />
               <Bar

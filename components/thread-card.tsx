@@ -1,8 +1,16 @@
 'use client'
 
 import { formatDistanceToNow } from 'date-fns'
-import { ko } from 'date-fns/locale'
-import { Eye, Heart, MessageCircle, Repeat2, Quote, ExternalLink } from 'lucide-react'
+import { ko, enUS } from 'date-fns/locale'
+import { useLocale, useTranslations } from 'next-intl'
+import {
+  Eye,
+  Heart,
+  MessageCircle,
+  Repeat2,
+  Quote,
+  ExternalLink,
+} from 'lucide-react'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { formatNumber } from '@/lib/format'
 import type { ThreadPost, MediaInsights } from '@/lib/threads-api'
@@ -13,12 +21,20 @@ interface ThreadCardProps {
 }
 
 export function ThreadCard({ post, showInsights = false }: ThreadCardProps) {
-  const timeAgo = formatDistanceToNow(new Date(post.timestamp), { addSuffix: true, locale: ko })
+  const locale = useLocale()
+  const t = useTranslations('thread')
+  const dateLocale = locale === 'en' ? enUS : ko
+  const timeAgo = formatDistanceToNow(new Date(post.timestamp), {
+    addSuffix: true,
+    locale: dateLocale,
+  })
 
   return (
     <article
       className="flex gap-3 px-4 py-4 border-b border-border hover:bg-muted/30 cursor-pointer transition-colors"
-      onClick={() => window.open(post.permalink, '_blank', 'noopener,noreferrer')}
+      onClick={() =>
+        window.open(post.permalink, '_blank', 'noopener,noreferrer')
+      }
     >
       <Avatar className="h-9 w-9 shrink-0">
         <AvatarFallback className="text-sm font-medium bg-muted">
@@ -31,8 +47,13 @@ export function ThreadCard({ post, showInsights = false }: ThreadCardProps) {
           <span className="text-[15px] font-semibold text-foreground truncate">
             @{post.username}
           </span>
-          <span className="text-[13px] text-muted-foreground shrink-0">{timeAgo}</span>
-          <ExternalLink className="h-3 w-3 text-muted-foreground ml-auto shrink-0" />
+          <span className="text-[13px] text-muted-foreground shrink-0">
+            {timeAgo}
+          </span>
+          <ExternalLink
+            className="h-3 w-3 text-muted-foreground ml-auto shrink-0"
+            aria-label={t('externalLink')}
+          />
         </div>
 
         <p className="text-[15px] leading-[22px] text-foreground line-clamp-3 break-words">

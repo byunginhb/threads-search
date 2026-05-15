@@ -7,19 +7,14 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from 'recharts'
+import { useTranslations } from 'next-intl'
 import { Card, CardContent } from '@/components/ui/card'
 import { formatNumber } from '@/lib/format'
 import type { MediaTypeGroup } from '@/lib/insights-stats'
+import type { MediaType } from '@/lib/threads-api'
 
 interface MediaTypeChartProps {
   groups: MediaTypeGroup[]
-}
-
-const TYPE_LABEL: Record<string, string> = {
-  TEXT: '텍스트',
-  IMAGE: '이미지',
-  VIDEO: '비디오',
-  CAROUSEL_ALBUM: '캐러셀',
 }
 
 // shadcn 토큰 기반의 차분한 팔레트
@@ -32,10 +27,24 @@ const COLORS = [
 
 const FALLBACK_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#a855f7']
 
+const KNOWN_TYPES: ReadonlyArray<MediaType> = [
+  'TEXT',
+  'IMAGE',
+  'VIDEO',
+  'CAROUSEL_ALBUM',
+]
+
+function isKnownType(value: string): value is MediaType {
+  return (KNOWN_TYPES as readonly string[]).includes(value)
+}
+
 export function MediaTypeChart({ groups }: MediaTypeChartProps) {
+  const t = useTranslations('insights.charts')
+  const tType = useTranslations('insights.mediaType')
+
   const total = groups.reduce((sum, g) => sum + g.count, 0)
   const data = groups.map((g) => ({
-    name: TYPE_LABEL[g.type] ?? g.type,
+    name: isKnownType(g.type) ? tType(g.type) : g.type,
     value: g.count,
     avgViews: g.avgViews,
   }))
@@ -43,9 +52,9 @@ export function MediaTypeChart({ groups }: MediaTypeChartProps) {
   return (
     <Card>
       <CardContent className="space-y-3">
-        <h3 className="font-semibold text-base">미디어 타입 분포</h3>
+        <h3 className="font-semibold text-base">{t('mediaTypeTitle')}</h3>
         {total === 0 ? (
-          <p className="text-sm text-muted-foreground">데이터 없음</p>
+          <p className="text-sm text-muted-foreground">{t('noData')}</p>
         ) : (
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <div className="w-full sm:w-1/2 h-[200px]">
@@ -78,7 +87,10 @@ export function MediaTypeChart({ groups }: MediaTypeChartProps) {
                     formatter={(v) => {
                       const numeric =
                         typeof v === 'number' ? v : Number(v) || 0
-                      return [`${numeric}개`, '게시물']
+                      return [
+                        t('postsCountUnit', { count: numeric }),
+                        t('postsLabel'),
+                      ]
                     }}
                   />
                 </PieChart>
@@ -105,7 +117,7 @@ export function MediaTypeChart({ groups }: MediaTypeChartProps) {
                     </span>
                   </span>
                   <span className="text-muted-foreground shrink-0">
-                    평균 {formatNumber(d.avgViews)} 조회
+                    {t('avgViewsCount', { value: formatNumber(d.avgViews) })}
                   </span>
                 </li>
               ))}

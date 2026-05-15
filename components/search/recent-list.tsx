@@ -1,4 +1,5 @@
 import { FileText } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 import { ThreadCard } from '@/components/thread-card'
 import { EmptyState } from '@/components/empty-state'
 import { getCachedMyPosts } from '@/lib/cache'
@@ -17,7 +18,8 @@ type LoadResult =
 
 async function loadRecent(
   userId: string,
-  accessToken: string
+  accessToken: string,
+  fallbackError: string
 ): Promise<LoadResult> {
   try {
     const posts = await getCachedMyPosts({
@@ -31,25 +33,29 @@ async function loadRecent(
   } catch (error) {
     return {
       kind: 'error',
-      message:
-        error instanceof Error ? error.message : '게시물을 불러오지 못했습니다',
+      message: error instanceof Error ? error.message : fallbackError,
     }
   }
 }
 
 export async function RecentList({ userId, accessToken }: RecentListProps) {
-  const result = await loadRecent(userId, accessToken)
+  const t = await getTranslations('search')
+  const tCommon = await getTranslations('common')
+
+  const result = await loadRecent(userId, accessToken, t('loadError'))
 
   if (result.kind === 'error') {
-    return <EmptyState title="오류가 발생했습니다" description={result.message} />
+    return (
+      <EmptyState title={tCommon('error')} description={result.message} />
+    )
   }
 
   if (result.posts.length === 0) {
     return (
       <EmptyState
         icon={<FileText className="h-10 w-10" />}
-        title="아직 게시물이 없습니다"
-        description="Threads에 글을 작성하면 여기에 표시됩니다."
+        title={t('noPostsTitle')}
+        description={t('noPostsDescription')}
       />
     )
   }
@@ -57,7 +63,7 @@ export async function RecentList({ userId, accessToken }: RecentListProps) {
   return (
     <div>
       <p className="px-4 py-3 text-sm text-muted-foreground border-b border-border">
-        최근 게시물 {result.posts.length}개
+        {t('recentCountLabel', { count: result.posts.length })}
       </p>
       {result.posts.map((post) => (
         <ThreadCard key={post.id} post={post} />

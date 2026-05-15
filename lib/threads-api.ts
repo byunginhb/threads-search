@@ -3,6 +3,8 @@
  * 본인 게시물(/{userId}/threads) 및 인사이트(/{postId}/insights) 호출 전용.
  */
 
+import { logServer } from '@/lib/log'
+
 export const THREADS_API_BASE = 'https://graph.threads.net/v1.0'
 
 export type MediaType = 'TEXT' | 'IMAGE' | 'VIDEO' | 'CAROUSEL_ALBUM'
@@ -56,7 +58,7 @@ export const DEFAULT_POST_FIELDS =
 
 /**
  * Threads Graph API GET 호출 헬퍼. 액세스 토큰을 자동으로 부착한다.
- * 호출자가 unstable_cache 내부에서 사용할 수 있도록 cache: 'no-store'를 명시한다.
+ * 로그에는 토큰을 항상 마스킹한다.
  */
 export async function threadsGet<T>(
   path: string,
@@ -67,25 +69,36 @@ export async function threadsGet<T>(
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
   url.searchParams.set('access_token', accessToken)
 
-  // 디버그용: 토큰 마스킹된 URL 로깅
-  const maskedUrl = url.toString().replace(/access_token=[^&]+/, 'access_token=***')
-  console.log('[threads-api] GET', maskedUrl)
+  // 토큰 마스킹된 URL 로깅
+  const maskedUrl = url
+    .toString()
+    .replace(/access_token=[^&]+/, 'access_token=***')
+  logServer.debug('[threads-api] GET', maskedUrl)
 
   const res = await fetch(url.toString(), { cache: 'no-store' })
   if (!res.ok) {
     const errorBody = await res.text().catch(() => '')
-    console.error('[threads-api] error response', {
+    logServer.error('[threads-api] error response', {
       status: res.status,
       url: maskedUrl,
-      body: errorBody,
+      bodyLength: errorBody.length,
     })
-    let parsed: { error?: { message?: string; code?: number; type?: string; error_subcode?: number } } = {}
+    let parsed: {
+      error?: {
+        message?: string
+        code?: number
+        type?: string
+        error_subcode?: number
+      }
+    } = {}
     try {
       parsed = JSON.parse(errorBody)
     } catch {
       // ignore
     }
-    throw new Error(parsed.error?.message ?? `Threads API error: ${res.status}`)
+    throw new Error(
+      parsed.error?.message ?? `Threads API error: ${res.status}`
+    )
   }
   return res.json() as Promise<T>
 }

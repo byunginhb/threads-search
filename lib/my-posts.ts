@@ -15,6 +15,7 @@ import {
   type PagedResponse,
   type InsightMetric,
 } from '@/lib/threads-api'
+import { logServer } from '@/lib/log'
 
 const LOG_PREFIX = '[my-posts]'
 
@@ -42,7 +43,7 @@ export async function fetchMyPosts({
   excludeReplies = true,
   fields = DEFAULT_POST_FIELDS,
 }: FetchMyPostsOptions): Promise<ThreadPost[]> {
-  console.log(`${LOG_PREFIX} fetchMyPosts start`, {
+  logServer.debug(`${LOG_PREFIX} fetchMyPosts start`, {
     userId,
     limit,
     maxPages,
@@ -68,7 +69,6 @@ export async function fetchMyPosts({
 
     const items = res.data ?? []
     if (items.length > 0) {
-      // 불변 패턴: spread로 새 배열 생성
       collected.push(...items)
     }
 
@@ -77,9 +77,7 @@ export async function fetchMyPosts({
     if (!after || items.length === 0) break
   }
 
-  // is_reply 필드는 threads_manage_replies 권한이 필요해 현재 미요청 상태.
-  // excludeReplies 옵션은 일단 무시하고 전체를 반환한다 (추후 scope 확장 시 활성화 가능).
-  console.log(`${LOG_PREFIX} fetchMyPosts done`, {
+  logServer.debug(`${LOG_PREFIX} fetchMyPosts done`, {
     pages: page,
     rawCount: collected.length,
     excludeRepliesRequested: excludeReplies,
@@ -110,9 +108,9 @@ export async function fetchPostInsights(
       { ...EMPTY_INSIGHTS }
     )
   } catch (error) {
-    console.error(`${LOG_PREFIX} fetchPostInsights failed`, {
+    logServer.error(`${LOG_PREFIX} fetchPostInsights failed`, {
       postId,
-      error: error instanceof Error ? error.message : error,
+      error: error instanceof Error ? error.message : 'unknown',
     })
     return null
   }
@@ -133,7 +131,7 @@ export async function fetchMyPostsWithInsights(
   const { accessToken, chunkSize = 10 } = opts
 
   const posts = await fetchMyPosts(opts)
-  console.log(`${LOG_PREFIX} fetchMyPostsWithInsights insights start`, {
+  logServer.debug(`${LOG_PREFIX} fetchMyPostsWithInsights insights start`, {
     postCount: posts.length,
     chunkSize,
   })
@@ -150,7 +148,7 @@ export async function fetchMyPostsWithInsights(
     result.push(...enriched)
   }
 
-  console.log(`${LOG_PREFIX} fetchMyPostsWithInsights done`, {
+  logServer.debug(`${LOG_PREFIX} fetchMyPostsWithInsights done`, {
     total: result.length,
   })
 

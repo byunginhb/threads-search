@@ -1,4 +1,5 @@
 import { SearchX } from 'lucide-react'
+import { getTranslations } from 'next-intl/server'
 import { ThreadCard } from '@/components/thread-card'
 import { EmptyState } from '@/components/empty-state'
 import { getCachedMyPosts } from '@/lib/cache'
@@ -17,7 +18,8 @@ type LoadResult =
 async function loadMatched(
   q: string,
   userId: string,
-  accessToken: string
+  accessToken: string,
+  fallbackError: string
 ): Promise<LoadResult> {
   try {
     const posts = await getCachedMyPosts({
@@ -33,8 +35,7 @@ async function loadMatched(
   } catch (error) {
     return {
       kind: 'error',
-      message:
-        error instanceof Error ? error.message : '검색에 실패했습니다',
+      message: error instanceof Error ? error.message : fallbackError,
     }
   }
 }
@@ -44,18 +45,23 @@ export async function MySearchResults({
   userId,
   accessToken,
 }: MySearchResultsProps) {
-  const result = await loadMatched(q, userId, accessToken)
+  const t = await getTranslations('search')
+  const tCommon = await getTranslations('common')
+
+  const result = await loadMatched(q, userId, accessToken, t('searchError'))
 
   if (result.kind === 'error') {
-    return <EmptyState title="오류가 발생했습니다" description={result.message} />
+    return (
+      <EmptyState title={tCommon('error')} description={result.message} />
+    )
   }
 
   if (result.matched.length === 0) {
     return (
       <EmptyState
         icon={<SearchX className="h-10 w-10" />}
-        title="일치하는 게시물이 없습니다"
-        description={`전체 ${result.total}개 중 매칭 0개`}
+        title={t('noMatchTitle')}
+        description={t('noMatchDescription', { total: result.total })}
       />
     )
   }
@@ -63,7 +69,11 @@ export async function MySearchResults({
   return (
     <div>
       <p className="px-4 py-3 text-sm text-muted-foreground border-b border-border">
-        &ldquo;{q}&rdquo; 결과 {result.matched.length}개 (전체 {result.total}개 중)
+        {t('matchedCountLabel', {
+          q,
+          matched: result.matched.length,
+          total: result.total,
+        })}
       </p>
       {result.matched.map((post) => (
         <ThreadCard key={post.id} post={post} />

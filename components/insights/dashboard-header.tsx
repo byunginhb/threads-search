@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -10,12 +11,11 @@ interface DashboardHeaderProps {
   excludeReplies: boolean
 }
 
-const LOG_PREFIX = '[dashboard-header]'
-
 export function DashboardHeader({
   postCount,
   excludeReplies,
 }: DashboardHeaderProps) {
+  const t = useTranslations('insights')
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -26,14 +26,12 @@ export function DashboardHeader({
     const params = new URLSearchParams(searchParams.toString())
     params.set('excludeReplies', next)
     const url = `${pathname}?${params.toString()}`
-    console.log(`${LOG_PREFIX} toggle replies`, { next, url })
     startTransition(() => {
       router.push(url)
     })
   }
 
   const handleRefresh = () => {
-    console.log(`${LOG_PREFIX} refresh clicked`)
     startTransition(() => {
       router.refresh()
     })
@@ -42,9 +40,14 @@ export function DashboardHeader({
   return (
     <div className="px-4 py-4 border-b border-border flex items-start justify-between gap-3">
       <div>
-        <h1 className="text-xl font-bold">내 인사이트</h1>
+        <h1 className="text-xl font-bold">{t('headerTitle')}</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          게시물 {postCount}개 · {excludeReplies ? '답글 제외' : '답글 포함'}
+          {t('headerSubtitle', {
+            count: postCount,
+            repliesLabel: excludeReplies
+              ? t('repliesExcluded')
+              : t('repliesIncluded'),
+          })}
         </p>
       </div>
       <div className="flex items-center gap-2 shrink-0">
@@ -55,7 +58,7 @@ export function DashboardHeader({
           onClick={handleToggleReplies}
           className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
-          <span>답글 포함</span>
+          <span>{t('toggleReplies')}</span>
           <span
             className={`relative inline-flex h-5 w-9 rounded-full transition-colors ${
               !excludeReplies ? 'bg-primary' : 'bg-muted'
@@ -73,7 +76,7 @@ export function DashboardHeader({
           size="icon-sm"
           onClick={handleRefresh}
           disabled={isPending}
-          aria-label="새로고침"
+          aria-label={t('refreshLabel')}
         >
           <RefreshCw
             className={`h-4 w-4 ${isPending ? 'animate-spin' : ''}`}

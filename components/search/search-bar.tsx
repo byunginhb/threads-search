@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useTransition, type FormEvent } from 'react'
-import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import { Search, X, Loader2 } from 'lucide-react'
+import { useRouter } from '@/i18n/navigation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 
@@ -10,13 +11,12 @@ interface SearchBarProps {
   defaultQuery?: string
 }
 
-const LOG_PREFIX = '[search-bar]'
-
 /**
  * 외부에서 defaultQuery가 바뀌면 (예: 뒤로가기) 부모에서 `key={defaultQuery}` 로
- * 컴포넌트를 재마운트하도록 한다. (useEffect + setState 패턴 회피)
+ * 컴포넌트를 재마운트하도록 한다.
  */
 export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
+  const t = useTranslations('search')
   const [query, setQuery] = useState(defaultQuery)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
@@ -24,15 +24,15 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     const trimmed = query.trim()
-    const url = trimmed ? `/search?q=${encodeURIComponent(trimmed)}` : '/search'
-    console.log(`${LOG_PREFIX} submit`, { query: trimmed, url })
+    const url = trimmed
+      ? `/search?q=${encodeURIComponent(trimmed)}`
+      : '/search'
     startTransition(() => {
       router.push(url)
     })
   }
 
   const handleClear = () => {
-    console.log(`${LOG_PREFIX} clear`)
     setQuery('')
     startTransition(() => {
       router.push('/search')
@@ -48,7 +48,7 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="내 게시물 검색..."
+              placeholder={t('placeholder')}
               disabled={isPending}
               className="pl-9 pr-9 rounded-full bg-muted border-0 focus-visible:ring-1 disabled:opacity-70"
             />
@@ -56,7 +56,7 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
               <button
                 type="button"
                 onClick={handleClear}
-                aria-label="검색어 지우기"
+                aria-label={t('clearLabel')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X className="h-4 w-4" />
@@ -70,16 +70,16 @@ export function SearchBar({ defaultQuery = '' }: SearchBarProps) {
             className="rounded-full px-5 min-w-[70px]"
           >
             {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" aria-label="검색 중" />
+              <Loader2 className="h-4 w-4 animate-spin" aria-label={t('loadingLabel')} />
             ) : (
-              '검색'
+              t('submit')
             )}
           </Button>
         </form>
         {isPending ? (
           <p className="text-xs text-muted-foreground mt-2 px-1 flex items-center gap-1.5">
             <Loader2 className="h-3 w-3 animate-spin" />
-            검색 중입니다…
+            {t('loading')}
           </p>
         ) : null}
       </div>

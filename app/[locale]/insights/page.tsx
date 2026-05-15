@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
+import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { FileText, AlertCircle } from 'lucide-react'
+import { redirect } from '@/i18n/navigation'
 import { DashboardHeader } from '@/components/insights/dashboard-header'
 import { SummaryCards } from '@/components/insights/summary-cards'
 import { TopPosts } from '@/components/insights/top-posts'
@@ -9,6 +10,7 @@ import { WeekdayChart } from '@/components/insights/weekday-chart'
 import { HourChart } from '@/components/insights/hour-chart'
 import { EmptyState } from '@/components/empty-state'
 import { getCachedMyPostsWithInsights } from '@/lib/cache'
+import { logServer } from '@/lib/log'
 import {
   computeTotals,
   computeAverages,
@@ -18,29 +20,37 @@ import {
 } from '@/lib/insights-stats'
 
 interface InsightsPageProps {
+  params: Promise<{ locale: string }>
   searchParams: Promise<{ excludeReplies?: string }>
 }
 
 const LOG_PREFIX = '[insights-page]'
 
 export default async function InsightsPage({
+  params,
   searchParams,
 }: InsightsPageProps) {
-  const params = await searchParams
-  const excludeReplies = (params.excludeReplies ?? 'true') !== 'false'
+  const { locale } = await params
+  setRequestLocale(locale)
+  const t = await getTranslations('insights')
+  const tCommon = await getTranslations('common')
+
+  const sp = await searchParams
+  const excludeReplies = (sp.excludeReplies ?? 'true') !== 'false'
 
   const cookieStore = await cookies()
   const accessToken = cookieStore.get('threads_token')?.value
   const userId = cookieStore.get('threads_user_id')?.value
 
-  console.log(`${LOG_PREFIX} render`, {
+  logServer.debug(`${LOG_PREFIX} render`, {
     excludeReplies,
     hasToken: Boolean(accessToken),
     hasUserId: Boolean(userId),
   })
 
   if (!accessToken || !userId) {
-    redirect('/auth')
+    redirect({ href: '/auth', locale })
+    return null
   }
 
   let posts: Awaited<ReturnType<typeof getCachedMyPostsWithInsights>> = []
@@ -52,11 +62,11 @@ export default async function InsightsPage({
       accessToken,
       excludeReplies,
     })
-    console.log(`${LOG_PREFIX} fetched posts`, { count: posts.length })
+    logServer.debug(`${LOG_PREFIX} fetched posts`, { count: posts.length })
   } catch (error) {
     fetchError =
-      error instanceof Error ? error.message : '인사이트를 불러오지 못했습니다'
-    console.error(`${LOG_PREFIX} fetch error`, fetchError)
+      error instanceof Error ? error.message : t('fetchErrorFallback')
+    logServer.error(`${LOG_PREFIX} fetch error`, fetchError)
   }
 
   if (fetchError) {
@@ -65,7 +75,7 @@ export default async function InsightsPage({
         <DashboardHeader postCount={0} excludeReplies={excludeReplies} />
         <EmptyState
           icon={<AlertCircle className="h-10 w-10" />}
-          title="오류가 발생했습니다"
+          title={tCommon('error')}
           description={fetchError}
         />
       </div>
@@ -78,8 +88,8 @@ export default async function InsightsPage({
         <DashboardHeader postCount={0} excludeReplies={excludeReplies} />
         <EmptyState
           icon={<FileText className="h-10 w-10" />}
-          title="게시물이 없습니다"
-          description="Threads에 글을 작성하면 통계가 여기에 표시됩니다."
+          title={t('noPostsTitle')}
+          description={t('noPostsDescription')}
         />
       </div>
     )
@@ -91,7 +101,7 @@ export default async function InsightsPage({
   const weekdayGroups = groupByWeekday(posts)
   const hourGroups = groupByHour(posts)
 
-  console.log(`${LOG_PREFIX} stats summary`, {
+  logServer.debug(`${LOG_PREFIX} stats summary`, {
     totalPosts: totals.count,
     totalViews: totals.views,
     avgViews: averages.avgViews,

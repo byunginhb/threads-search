@@ -1,12 +1,16 @@
-import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
+import { Link } from '@/i18n/navigation'
+import { LanguageSwitcher } from '@/components/language-switcher'
 
-const links = [
-  { href: '/privacy', label: '개인정보처리방침' },
-  { href: '/terms', label: '서비스 약관' },
-  { href: '/data-deletion', label: '데이터 삭제' },
-]
+export async function Footer() {
+  const t = await getTranslations('footer')
 
-export function Footer() {
+  const links = [
+    { href: '/privacy', label: t('privacy') },
+    { href: '/terms', label: t('terms') },
+    { href: '/data-deletion', label: t('dataDeletion') },
+  ] as const
+
   return (
     <footer className="border-t border-border mt-16">
       <div className="max-w-[860px] mx-auto px-4 py-8 flex flex-col items-center gap-3 text-center">
@@ -21,9 +25,9 @@ export function Footer() {
             </Link>
           ))}
         </nav>
+        <LanguageSwitcher />
         <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Threads-insight팀 · 본 서비스는 Meta Platforms,
-          Inc. 의 공식 제품이 아닙니다.
+          {t('copyright', { year: new Date().getFullYear() })}
         </p>
       </div>
     </footer>

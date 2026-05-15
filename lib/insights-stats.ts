@@ -8,6 +8,7 @@ import type {
   MediaInsights,
   MediaType,
 } from '@/lib/threads-api'
+import { logServer } from '@/lib/log'
 
 const LOG_PREFIX = '[insights-stats]'
 
@@ -55,7 +56,7 @@ export function computeTotals(posts: PostWithInsights[]): Totals {
     }),
     { views: 0, likes: 0, replies: 0, reposts: 0, quotes: 0, count: 0 }
   )
-  console.log(`${LOG_PREFIX} computeTotals`, {
+  logServer.debug(`${LOG_PREFIX} computeTotals`, {
     inputLen: posts.length,
     out: result,
   })
@@ -71,7 +72,7 @@ export function computeAverages(posts: PostWithInsights[]): Averages {
       avgReposts: 0,
       avgQuotes: 0,
     }
-    console.log(`${LOG_PREFIX} computeAverages empty`, { inputLen: 0 })
+    logServer.debug(`${LOG_PREFIX} computeAverages empty`, { inputLen: 0 })
     return empty
   }
   const totals = computeTotals(posts)
@@ -83,7 +84,7 @@ export function computeAverages(posts: PostWithInsights[]): Averages {
     avgReposts: Math.round(totals.reposts / n),
     avgQuotes: Math.round(totals.quotes / n),
   }
-  console.log(`${LOG_PREFIX} computeAverages`, {
+  logServer.debug(`${LOG_PREFIX} computeAverages`, {
     inputLen: posts.length,
     out: result,
   })
@@ -99,7 +100,7 @@ export function topByMetric(
     (a, b) => b.insights[metric] - a.insights[metric]
   )
   const result = sorted.slice(0, n)
-  console.log(`${LOG_PREFIX} topByMetric`, {
+  logServer.debug(`${LOG_PREFIX} topByMetric`, {
     inputLen: posts.length,
     metric,
     n,
@@ -127,7 +128,7 @@ export function groupByMediaType(
       avgViews: count > 0 ? Math.round(views / count) : 0,
     })
   )
-  console.log(`${LOG_PREFIX} groupByMediaType`, {
+  logServer.debug(`${LOG_PREFIX} groupByMediaType`, {
     inputLen: posts.length,
     out: result,
   })
@@ -152,7 +153,7 @@ export function groupByWeekday(posts: PostWithInsights[]): WeekdayGroup[] {
     count: b.count,
     avgViews: b.count > 0 ? Math.round(b.views / b.count) : 0,
   }))
-  console.log(`${LOG_PREFIX} groupByWeekday`, {
+  logServer.debug(`${LOG_PREFIX} groupByWeekday`, {
     inputLen: posts.length,
     counts: result.map((r) => r.count),
   })
@@ -177,7 +178,7 @@ export function groupByHour(posts: PostWithInsights[]): HourGroup[] {
     count: b.count,
     avgViews: b.count > 0 ? Math.round(b.views / b.count) : 0,
   }))
-  console.log(`${LOG_PREFIX} groupByHour`, {
+  logServer.debug(`${LOG_PREFIX} groupByHour`, {
     inputLen: posts.length,
     nonZeroHours: result.filter((r) => r.count > 0).length,
   })

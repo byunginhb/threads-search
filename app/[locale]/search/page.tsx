@@ -1,33 +1,43 @@
 import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
+import { setRequestLocale } from 'next-intl/server'
+import { redirect } from '@/i18n/navigation'
 import { SearchBar } from '@/components/search/search-bar'
 import { RecentList } from '@/components/search/recent-list'
 import { MySearchResults } from '@/components/search/my-search-results'
 import { PostsSkeleton } from '@/components/loading/posts-skeleton'
+import { logServer } from '@/lib/log'
 
 interface SearchPageProps {
+  params: Promise<{ locale: string }>
   searchParams: Promise<{ q?: string }>
 }
 
 const LOG_PREFIX = '[search-page]'
 
-export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const params = await searchParams
-  const q = params.q?.trim() ?? ''
+export default async function SearchPage({
+  params,
+  searchParams,
+}: SearchPageProps) {
+  const { locale } = await params
+  setRequestLocale(locale)
+
+  const sp = await searchParams
+  const q = sp.q?.trim() ?? ''
 
   const cookieStore = await cookies()
   const accessToken = cookieStore.get('threads_token')?.value
   const userId = cookieStore.get('threads_user_id')?.value
 
-  console.log(`${LOG_PREFIX} render`, {
+  logServer.debug(`${LOG_PREFIX} render`, {
     q,
     hasToken: Boolean(accessToken),
     hasUserId: Boolean(userId),
   })
 
   if (!accessToken || !userId) {
-    redirect('/auth')
+    redirect({ href: '/auth', locale })
+    return null
   }
 
   return (
