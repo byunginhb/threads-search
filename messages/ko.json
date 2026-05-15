@@ -227,5 +227,17 @@
     "noteItem3": "**데이터베이스 저장** · 없음",
     "noteOutro": "별도 데이터베이스가 없기 때문에, 로그아웃 또는 Threads 권한 회수만으로도 본 서비스가 보관하는 모든 정보가 실질적으로 제거됩니다. 자세한 내용은 {privacyLink} 을 참고하세요.",
     "privacyLink": "개인정보처리방침"
+  },
+  "deletionStatus": {
+    "title": "데이터 삭제 요청이 접수되었습니다",
+    "description": "회원님의 Threads Search 데이터 삭제 요청이 정상적으로 처리되었습니다.",
+    "confirmationLabel": "확인 코드",
+    "whatWasDeletedHeading": "처리된 내용",
+    "item1": "브라우저 쿠키에 저장된 액세스 토큰 및 사용자 식별 정보 즉시 삭제",
+    "item2": "서버 인메모리 캐시(최대 5분) 자동 폐기",
+    "item3": "데이터베이스에 영구 저장된 정보 없음 (해당 사항 없음)",
+    "detailsFooter": "본 서비스의 데이터 처리 방식에 관한 자세한 내용은 다음 페이지를 참고하세요:",
+    "privacyLink": "개인정보처리방침",
+    "backHome": "홈으로 돌아가기"
   }
 }

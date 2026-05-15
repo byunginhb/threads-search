@@ -227,5 +227,17 @@
     "noteItem3": "**Database storage** · None",
     "noteOutro": "Because there is no separate database, signing out or revoking permission in Threads effectively removes all information the Service holds. See the {privacyLink} for details.",
     "privacyLink": "Privacy Policy"
+  },
+  "deletionStatus": {
+    "title": "Data deletion request received",
+    "description": "Your Threads Search data deletion request has been received and processed.",
+    "confirmationLabel": "Confirmation code",
+    "whatWasDeletedHeading": "What was deleted",
+    "item1": "Access token and user identification cookies in the browser were cleared immediately",
+    "item2": "Server in-memory cache (up to 5 minutes) is auto-discarded",
+    "item3": "No data is persisted in any database (none to delete)",
+    "detailsFooter": "For more details about how this service handles data, see the",
+    "privacyLink": "Privacy Policy",
+    "backHome": "Back to home"
   }
 }
