@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers'
+import Image from 'next/image'
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 import { Search, BarChart2, ArrowRight, LogOut } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
@@ -24,15 +25,25 @@ export default async function HomePage({ params }: HomePageProps) {
 
   return (
     <main className="max-w-[620px] mx-auto px-4 py-16 flex flex-col items-center text-center gap-8">
-      <div className="space-y-3">
-        <h1 className="text-3xl font-bold text-foreground">
-          {tCommon('appName')}
-        </h1>
-        <p className="text-muted-foreground text-[16px] leading-relaxed">
-          {t('tagline1')}
-          <br />
-          {t('tagline2')}
-        </p>
+      <div className="flex flex-col items-center gap-4">
+        <Image
+          src="/logo.png"
+          alt=""
+          width={96}
+          height={96}
+          priority
+          className="h-20 w-20 rounded-2xl shadow-sm"
+        />
+        <div className="space-y-3">
+          <h1 className="text-3xl font-bold text-foreground">
+            {tCommon('appName')}
+          </h1>
+          <p className="text-muted-foreground text-[16px] leading-relaxed">
+            {t('tagline1')}
+            <br />
+            {t('tagline2')}
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">

@@ -1,4 +1,5 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server'
+import Image from 'next/image'
 import { ExternalLink, KeyRound, BarChart3, ShieldAlert } from 'lucide-react'
 import { Link } from '@/i18n/navigation'
 import { buttonVariants } from '@/components/ui/button'
@@ -22,6 +23,14 @@ export default async function AuthPage({
 
   return (
     <main className="max-w-[620px] mx-auto px-4 py-12 flex flex-col items-center text-center gap-6">
+      <Image
+        src="/logo.png"
+        alt=""
+        width={72}
+        height={72}
+        priority
+        className="h-16 w-16 rounded-2xl shadow-sm"
+      />
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">{t('title')}</h1>
         <p className="text-muted-foreground text-sm leading-relaxed">

@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import Image from 'next/image'
 import { Home, Search, BarChart2 } from 'lucide-react'
 import { Link, usePathname } from '@/i18n/navigation'
 import { cn } from '@/lib/utils'
@@ -19,14 +20,23 @@ export function NavBar() {
     <>
       {/* PC: 좌측 사이드바 */}
       <nav className="hidden md:flex fixed left-0 top-0 h-full w-[72px] lg:w-[245px] border-r border-border flex-col bg-background z-50">
-        <div className="px-3 py-5 lg:px-6">
-          <span className="hidden lg:block text-xl font-bold text-foreground">
+        <Link
+          href="/"
+          aria-label={t('appName')}
+          className="px-3 py-5 lg:px-6 flex items-center gap-2"
+        >
+          <Image
+            src="/logo.png"
+            alt=""
+            width={32}
+            height={32}
+            priority
+            className="h-8 w-8 rounded-md shrink-0"
+          />
+          <span className="hidden lg:block text-lg font-bold text-foreground truncate">
             {t('appName')}
           </span>
-          <span className="lg:hidden text-xl font-bold text-foreground">
-            {t('appShort')}
-          </span>
-        </div>
+        </Link>
         <div className="flex flex-col gap-1 px-2 lg:px-3 flex-1">
           {navItems.map(({ href, icon: Icon, key }) => {
             const isActive =
