@@ -22,42 +22,37 @@ export default async function HomePage() {
         </p>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
         <Link
           href="/search"
-          className={cn(buttonVariants(), 'flex-1 gap-2 rounded-full')}
+          className="group relative border border-border rounded-xl p-5 text-left space-y-2 transition-all hover:border-foreground hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 cursor-pointer"
         >
-          <Search className="h-4 w-4" />
-          게시물 검색
-        </Link>
-        <Link
-          href="/insights"
-          className={cn(buttonVariants({ variant: 'outline' }), 'flex-1 gap-2 rounded-full')}
-        >
-          <BarChart2 className="h-4 w-4" />
-          내 인사이트
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-4">
-        <div className="border border-border rounded-xl p-5 text-left space-y-2">
-          <div className="flex items-center gap-2 font-semibold">
-            <Search className="h-5 w-5" />
-            내 게시물 검색
+          <div className="flex items-center justify-between font-semibold">
+            <div className="flex items-center gap-2">
+              <Search className="h-5 w-5" />
+              내 게시물 검색
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-foreground" />
           </div>
           <p className="text-sm text-muted-foreground">
             내가 작성한 Threads 게시물을 텍스트로 빠르게 찾아 원문으로 이동합니다.
           </p>
-        </div>
-        <div className="border border-border rounded-xl p-5 text-left space-y-2">
-          <div className="flex items-center gap-2 font-semibold">
-            <BarChart2 className="h-5 w-5" />
-            인사이트 대시보드
+        </Link>
+        <Link
+          href="/insights"
+          className="group relative border border-border rounded-xl p-5 text-left space-y-2 transition-all hover:border-foreground hover:shadow-md hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/40 cursor-pointer"
+        >
+          <div className="flex items-center justify-between font-semibold">
+            <div className="flex items-center gap-2">
+              <BarChart2 className="h-5 w-5" />
+              인사이트 대시보드
+            </div>
+            <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-foreground" />
           </div>
           <p className="text-sm text-muted-foreground">
             조회수·좋아요·댓글 통계와 미디어/요일/시간대별 패턴을 그래프로 확인합니다.
           </p>
-        </div>
+        </Link>
       </div>
 
       {isAuthenticated ? (
